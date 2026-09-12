@@ -1,1 +1,470 @@
+/* =========================================
+   FLOWFORGE
+   ========================================= */
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111318;
+    color: #f5f7fa;
+    height: 100vh;
+    overflow: hidden;
+}
+
+
+/* ================= HEADER ================= */
+
+.topbar {
+    height: 70px;
+    border-bottom: 1px solid #292d35;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
+
+    background: #15181e;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo span {
+    font-size: 25px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+}
+
+.secondary-btn,
+.run-btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+
+    font-weight: 600;
+}
+
+.secondary-btn {
+    background: #242832;
+    color: #d8dce3;
+}
+
+.run-btn {
+    background: #38bdf8;
+    color: #061018;
+}
+
+
+/* ================= APP ================= */
+
+.app {
+    display: grid;
+
+    grid-template-columns: 240px 1fr 280px;
+
+    height: calc(100vh - 70px);
+}
+
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+    border-right: 1px solid #292d35;
+
+    padding: 22px;
+
+    background: #15181e;
+}
+
+.sidebar h2,
+.logs h2 {
+    font-size: 16px;
+}
+
+.description {
+    color: #858b98;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin: 8px 0 20px;
+}
+
+
+.node-library {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.library-node {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    background: #1d2129;
+
+    color: white;
+
+    text-align: left;
+
+    border: 1px solid #2a2f39;
+
+    transition: 0.2s;
+}
+
+.library-node:hover {
+    transform: translateX(3px);
+
+    border-color: #38bdf8;
+}
+
+.library-node > span {
+    font-size: 20px;
+}
+
+.library-node strong {
+    display: block;
+
+    font-size: 13px;
+}
+
+.library-node small {
+    display: block;
+
+    color: #858b98;
+
+    margin-top: 3px;
+
+    font-size: 11px;
+}
+
+
+/* ================= WORKSPACE ================= */
+
+.workspace {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.workspace-header {
+    height: 75px;
+
+    padding: 16px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #292d35;
+}
+
+.workspace-header h1 {
+    font-size: 18px;
+}
+
+.workspace-header p {
+    color: #858b98;
+
+    font-size: 12px;
+
+    margin-top: 5px;
+}
+
+#nodeCount {
+    font-size: 12px;
+
+    color: #858b98;
+
+    background: #1d2129;
+
+    padding: 7px 10px;
+
+    border-radius: 20px;
+}
+
+
+/* ================= CANVAS ================= */
+
+.canvas {
+    position: relative;
+
+    flex: 1;
+
+    overflow: auto;
+
+    background-color: #101217;
+
+    background-image:
+        radial-gradient(#2a2f38 1px, transparent 1px);
+
+    background-size: 25px 25px;
+}
+
+
+.empty-state {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+
+    color: #717784;
+}
+
+.empty-icon {
+    font-size: 35px;
+
+    margin-bottom: 10px;
+}
+
+.empty-state h2 {
+    color: #b9bec8;
+
+    font-size: 18px;
+
+    margin-bottom: 7px;
+}
+
+.empty-state p {
+    font-size: 13px;
+}
+
+
+/* ================= WORKFLOW NODE ================= */
+
+.workflow-node {
+    position: absolute;
+
+    width: 190px;
+
+    min-height: 95px;
+
+    background: #1a1e25;
+
+    border: 1px solid #353b46;
+
+    border-radius: 12px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+    overflow: hidden;
+
+    user-select: none;
+}
+
+.node-header {
+    padding: 10px 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #2c313a;
+}
+
+.node-title {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.delete-node {
+    background: transparent;
+
+    color: #777e8b;
+
+    font-size: 14px;
+}
+
+.delete-node:hover {
+    color: #ff6b6b;
+}
+
+.node-body {
+    padding: 12px;
+
+    color: #8e95a3;
+
+    font-size: 11px;
+}
+
+.node-port {
+    position: absolute;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #38bdf8;
+
+    border: 2px solid #101217;
+}
+
+.input-port {
+    left: -5px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+}
+
+.output-port {
+    right: -5px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+}
+
+
+/* ================= NODE TYPES ================= */
+
+.node-trigger {
+    border-color: #38bdf8;
+}
+
+.node-action {
+    border-color: #a78bfa;
+}
+
+.node-condition {
+    border-color: #fbbf24;
+}
+
+.node-output {
+    border-color: #4ade80;
+}
+
+
+/* ================= LOGS ================= */
+
+.logs {
+    border-left: 1px solid #292d35;
+
+    background: #15181e;
+
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.status {
+    margin-top: 15px;
+
+    padding: 9px 11px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+}
+
+.status.idle {
+    background: #20242c;
+
+    color: #9299a6;
+}
+
+.status.running {
+    background: #172c38;
+
+    color: #38bdf8;
+}
+
+.status.success {
+    background: #193021;
+
+    color: #4ade80;
+}
+
+.logs-container {
+    margin-top: 12px;
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    font-size: 12px;
+}
+
+.log-placeholder {
+    color: #666d79;
+
+    line-height: 1.5;
+}
+
+.log {
+    padding: 10px 0;
+
+    border-bottom: 1px solid #242832;
+
+    color: #aeb4bf;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+    .app {
+        grid-template-columns: 200px 1fr;
+    }
+
+    .logs {
+        display: none;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .app {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+}
