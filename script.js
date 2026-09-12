@@ -1,65 +1,113 @@
 /* =========================================
-   FLOWFORGE
-   WORKFLOW ENGINE
+   FLOWFORGE V0.2
+   REAL WORKFLOW CONNECTIONS
    ========================================= */
 
 
-/* ================= STATE ================= */
+/* =========================================
+   STATE
+   ========================================= */
+
 
 let nodes = [];
 
+let connections = [];
+
 let nodeId = 0;
 
-
-/* ================= DOM ================= */
-
-const canvas = document.getElementById("canvas");
-
-const emptyState = document.getElementById("emptyState");
-
-const nodeCount = document.getElementById("nodeCount");
-
-const runBtn = document.getElementById("runBtn");
-
-const clearBtn = document.getElementById("clearBtn");
-
-const status = document.getElementById("status");
-
-const logsContainer = document.getElementById("logsContainer");
+let connectingFrom = null;
 
 
-/* ================= NODE DEFINITIONS ================= */
+/* =========================================
+   DOM ELEMENTS
+   ========================================= */
+
+
+const canvas =
+    document.getElementById("canvas");
+
+const connectionsLayer =
+    document.getElementById("connectionsLayer");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const nodeCount =
+    document.getElementById("nodeCount");
+
+const connectionCount =
+    document.getElementById("connectionCount");
+
+const runBtn =
+    document.getElementById("runBtn");
+
+const clearBtn =
+    document.getElementById("clearBtn");
+
+const status =
+    document.getElementById("status");
+
+const logsContainer =
+    document.getElementById("logsContainer");
+
+
+/* =========================================
+   NODE DEFINITIONS
+   ========================================= */
+
 
 const nodeTypes = {
 
     trigger: {
+
         title: "Trigger",
+
         icon: "⚡",
+
         description: "Starts the workflow"
+
     },
+
 
     action: {
+
         title: "Action",
+
         icon: "⚙️",
+
         description: "Performs an action"
+
     },
+
 
     condition: {
+
         title: "Condition",
+
         icon: "🔀",
+
         description: "Checks a condition"
+
     },
 
+
     output: {
+
         title: "Output",
+
         icon: "📤",
+
         description: "Produces final output"
+
     }
 
 };
 
 
-/* ================= ADD NODE ================= */
+/* =========================================
+   ADD NODE
+   ========================================= */
+
 
 function addNode(type) {
 
@@ -77,9 +125,15 @@ function addNode(type) {
 
         type: type,
 
-        x: 100 + ((nodeId - 1) % 3) * 230,
+        x:
+            100 +
+            ((nodeId - 1) % 3) * 240,
 
-        y: 100 + Math.floor((nodeId - 1) / 3) * 150
+        y:
+            100 +
+            Math.floor(
+                (nodeId - 1) / 3
+            ) * 160
 
     };
 
@@ -89,31 +143,42 @@ function addNode(type) {
 
     renderNode(node);
 
-    updateNodeCount();
+    updateStats();
 
     hideEmptyState();
 
 }
 
 
-/* ================= RENDER NODE ================= */
+/* =========================================
+   RENDER NODE
+   ========================================= */
+
 
 function renderNode(node) {
 
-    const definition = nodeTypes[node.type];
+    const definition =
+        nodeTypes[node.type];
 
 
-    const element = document.createElement("div");
+    const element =
+        document.createElement("div");
+
 
     element.className =
         `workflow-node node-${node.type}`;
 
-    element.dataset.id = node.id;
+
+    element.dataset.id =
+        node.id;
 
 
-    element.style.left = `${node.x}px`;
+    element.style.left =
+        `${node.x}px`;
 
-    element.style.top = `${node.y}px`;
+
+    element.style.top =
+        `${node.y}px`;
 
 
     element.innerHTML = `
@@ -122,11 +187,14 @@ function renderNode(node) {
 
             <div class="node-title">
 
-                <span>${definition.icon}</span>
+                <span>
+                    ${definition.icon}
+                </span>
 
                 ${definition.title}
 
             </div>
+
 
             <button class="delete-node">
                 ×
@@ -134,21 +202,34 @@ function renderNode(node) {
 
         </div>
 
+
         <div class="node-body">
 
             ${definition.description}
 
         </div>
 
+
         ${
             node.type !== "trigger"
-                ? `<div class="node-port input-port"></div>`
+                ? `
+                    <div
+                        class="node-port input-port"
+                        data-port="input"
+                    ></div>
+                  `
                 : ""
         }
 
+
         ${
             node.type !== "output"
-                ? `<div class="node-port output-port"></div>`
+                ? `
+                    <div
+                        class="node-port output-port"
+                        data-port="output"
+                    ></div>
+                  `
                 : ""
         }
 
@@ -158,32 +239,467 @@ function renderNode(node) {
     canvas.appendChild(element);
 
 
-    /* Delete node */
+    /* Delete */
 
     const deleteButton =
         element.querySelector(".delete-node");
 
 
-    deleteButton.addEventListener("click", () => {
+    deleteButton.addEventListener(
+        "click",
+        (event) => {
 
-        deleteNode(node.id);
+            event.stopPropagation();
 
-    });
+            deleteNode(node.id);
+
+        }
+    );
 
 
-    /* Drag node */
+    /* Output port */
 
-    makeDraggable(element, node);
+    const outputPort =
+        element.querySelector(".output-port");
+
+
+    if (outputPort) {
+
+        outputPort.addEventListener(
+            "click",
+            (event) => {
+
+                event.stopPropagation();
+
+                startConnection(node.id);
+
+            }
+        );
+
+    }
+
+
+    /* Input port */
+
+    const inputPort =
+        element.querySelector(".input-port");
+
+
+    if (inputPort) {
+
+        inputPort.addEventListener(
+            "click",
+            (event) => {
+
+                event.stopPropagation();
+
+                finishConnection(node.id);
+
+            }
+        );
+
+    }
+
+
+    /* Dragging */
+
+    makeDraggable(
+        element,
+        node
+    );
 
 }
 
 
-/* ================= DELETE NODE ================= */
+/* =========================================
+   START CONNECTION
+   ========================================= */
+
+
+function startConnection(nodeId) {
+
+    const node =
+        nodes.find(
+            item => item.id === nodeId
+        );
+
+
+    if (!node) return;
+
+
+    connectingFrom = nodeId;
+
+
+    document
+        .querySelectorAll(".output-port")
+        .forEach(port => {
+
+            port.classList.remove(
+                "connecting"
+            );
+
+        });
+
+
+    const element =
+        document.querySelector(
+            `.workflow-node[data-id="${nodeId}"]`
+        );
+
+
+    const port =
+        element.querySelector(
+            ".output-port"
+        );
+
+
+    if (port) {
+
+        port.classList.add(
+            "connecting"
+        );
+
+    }
+
+
+    addLog(
+        `🔗 Select an input port to connect from ${nodeTypes[node.type].title}.`
+    );
+
+}
+
+
+/* =========================================
+   FINISH CONNECTION
+   ========================================= */
+
+
+function finishConnection(targetNodeId) {
+
+    if (connectingFrom === null) {
+
+        return;
+
+    }
+
+
+    const sourceNodeId =
+        connectingFrom;
+
+
+    connectingFrom = null;
+
+
+    clearPortStates();
+
+
+    /* Prevent self connection */
+
+    if (
+        sourceNodeId === targetNodeId
+    ) {
+
+        addLog(
+            "❌ A node cannot connect to itself."
+        );
+
+        return;
+
+    }
+
+
+    /* Check duplicate */
+
+    const duplicate =
+        connections.some(
+            connection =>
+                connection.from === sourceNodeId &&
+                connection.to === targetNodeId
+        );
+
+
+    if (duplicate) {
+
+        addLog(
+            "❌ This connection already exists."
+        );
+
+        return;
+
+    }
+
+
+    /* Create connection */
+
+    connections.push({
+
+        from: sourceNodeId,
+
+        to: targetNodeId
+
+    });
+
+
+    drawConnections();
+
+    updateStats();
+
+
+    addLog(
+        `🔗 Connected Node ${sourceNodeId} → Node ${targetNodeId}`
+    );
+
+}
+
+
+/* =========================================
+   CLEAR PORT STATES
+   ========================================= */
+
+
+function clearPortStates() {
+
+    document
+        .querySelectorAll(".node-port")
+        .forEach(port => {
+
+            port.classList.remove(
+                "connecting"
+            );
+
+            port.classList.remove(
+                "connection-target"
+            );
+
+        });
+
+}
+
+
+/* =========================================
+   DRAW CONNECTIONS
+   ========================================= */
+
+
+function drawConnections() {
+
+    connectionsLayer.innerHTML = "";
+
+
+    connections.forEach(
+        (connection, index) => {
+
+            const sourceElement =
+                document.querySelector(
+                    `.workflow-node[data-id="${connection.from}"]`
+                );
+
+
+            const targetElement =
+                document.querySelector(
+                    `.workflow-node[data-id="${connection.to}"]`
+                );
+
+
+            if (
+                !sourceElement ||
+                !targetElement
+            ) {
+
+                return;
+
+            }
+
+
+            const sourcePort =
+                sourceElement.querySelector(
+                    ".output-port"
+                );
+
+
+            const targetPort =
+                targetElement.querySelector(
+                    ".input-port"
+                );
+
+
+            if (
+                !sourcePort ||
+                !targetPort
+            ) {
+
+                return;
+
+            }
+
+
+            const sourceRect =
+                sourcePort.getBoundingClientRect();
+
+
+            const targetRect =
+                targetPort.getBoundingClientRect();
+
+
+            const canvasRect =
+                canvas.getBoundingClientRect();
+
+
+            const x1 =
+                sourceRect.left +
+                sourceRect.width / 2 -
+                canvasRect.left +
+                canvas.scrollLeft;
+
+
+            const y1 =
+                sourceRect.top +
+                sourceRect.height / 2 -
+                canvasRect.top +
+                canvas.scrollTop;
+
+
+            const x2 =
+                targetRect.left +
+                targetRect.width / 2 -
+                canvasRect.left +
+                canvas.scrollLeft;
+
+
+            const y2 =
+                targetRect.top +
+                targetRect.height / 2 -
+                canvasRect.top +
+                canvas.scrollTop;
+
+
+            const distance =
+                Math.abs(x2 - x1);
+
+
+            const curve =
+                Math.max(
+                    60,
+                    distance * 0.5
+                );
+
+
+            const path =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "path"
+                );
+
+
+            const pathData = `
+
+                M ${x1} ${y1}
+
+                C
+                ${x1 + curve} ${y1},
+                ${x2 - curve} ${y2},
+                ${x2} ${y2}
+
+            `;
+
+
+            path.setAttribute(
+                "d",
+                pathData
+            );
+
+
+            path.classList.add(
+                "connection-line"
+            );
+
+
+            path.dataset.index =
+                index;
+
+
+            path.addEventListener(
+                "dblclick",
+                () => {
+
+                    deleteConnection(index);
+
+                }
+            );
+
+
+            connectionsLayer.appendChild(
+                path
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   DELETE CONNECTION
+   ========================================= */
+
+
+function deleteConnection(index) {
+
+    if (
+        index < 0 ||
+        index >= connections.length
+    ) {
+
+        return;
+
+    }
+
+
+    connections.splice(
+        index,
+        1
+    );
+
+
+    drawConnections();
+
+    updateStats();
+
+
+    addLog(
+        "🗑️ Connection removed."
+    );
+
+}
+
+
+/* =========================================
+   DELETE NODE
+   ========================================= */
+
 
 function deleteNode(id) {
 
-    nodes = nodes.filter(node => node.id !== id);
 
+    /* Remove node */
+
+    nodes =
+        nodes.filter(
+            node => node.id !== id
+        );
+
+
+    /* Remove related connections */
+
+    connections =
+        connections.filter(
+            connection =>
+                connection.from !== id &&
+                connection.to !== id
+        );
+
+
+    /* Remove visual node */
 
     const element =
         document.querySelector(
@@ -198,21 +714,35 @@ function deleteNode(id) {
     }
 
 
-    updateNodeCount();
+    drawConnections();
+
+    updateStats();
 
 
     if (nodes.length === 0) {
 
-        emptyState.style.display = "block";
+        emptyState.style.display =
+            "block";
 
     }
+
+
+    addLog(
+        `🗑️ Node ${id} removed.`
+    );
 
 }
 
 
-/* ================= DRAGGING ================= */
+/* =========================================
+   DRAGGING
+   ========================================= */
 
-function makeDraggable(element, node) {
+
+function makeDraggable(
+    element,
+    node
+) {
 
     let dragging = false;
 
@@ -221,34 +751,58 @@ function makeDraggable(element, node) {
     let offsetY = 0;
 
 
-    element.addEventListener("mousedown", startDrag);
+    element.addEventListener(
+        "mousedown",
+        startDrag
+    );
 
 
     function startDrag(event) {
 
         if (
-            event.target.classList.contains("delete-node")
+            event.target.closest(
+                ".node-port"
+            )
         ) {
+
             return;
+
+        }
+
+
+        if (
+            event.target.closest(
+                ".delete-node"
+            )
+        ) {
+
+            return;
+
         }
 
 
         dragging = true;
 
 
+        const rect =
+            element.getBoundingClientRect();
+
+
         offsetX =
             event.clientX -
-            element.getBoundingClientRect().left;
+            rect.left;
+
 
         offsetY =
             event.clientY -
-            element.getBoundingClientRect().top;
+            rect.top;
 
 
         document.addEventListener(
             "mousemove",
             drag
         );
+
 
         document.addEventListener(
             "mouseup",
@@ -263,20 +817,20 @@ function makeDraggable(element, node) {
         if (!dragging) return;
 
 
-        const rect =
+        const canvasRect =
             canvas.getBoundingClientRect();
 
 
         node.x =
             event.clientX -
-            rect.left -
+            canvasRect.left -
             offsetX +
             canvas.scrollLeft;
 
 
         node.y =
             event.clientY -
-            rect.top -
+            canvasRect.top -
             offsetY +
             canvas.scrollTop;
 
@@ -284,8 +838,12 @@ function makeDraggable(element, node) {
         element.style.left =
             `${node.x}px`;
 
+
         element.style.top =
             `${node.y}px`;
+
+
+        drawConnections();
 
     }
 
@@ -300,6 +858,7 @@ function makeDraggable(element, node) {
             drag
         );
 
+
         document.removeEventListener(
             "mouseup",
             stopDrag
@@ -310,9 +869,12 @@ function makeDraggable(element, node) {
 }
 
 
-/* ================= NODE COUNT ================= */
+/* =========================================
+   UPDATE STATS
+   ========================================= */
 
-function updateNodeCount() {
+
+function updateStats() {
 
     nodeCount.textContent =
         `${nodes.length} ${
@@ -321,21 +883,47 @@ function updateNodeCount() {
                 : "nodes"
         }`;
 
+
+    connectionCount.textContent =
+        `${connections.length} ${
+            connections.length === 1
+                ? "connection"
+                : "connections"
+        }`;
+
 }
 
 
-/* ================= EMPTY STATE ================= */
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+
 
 function hideEmptyState() {
 
-    emptyState.style.display = "none";
+    emptyState.style.display =
+        "none";
 
 }
 
 
-/* ================= LOGGING ================= */
+/* =========================================
+   LOGGING
+   ========================================= */
+
 
 function addLog(message) {
+
+    if (
+        logsContainer.querySelector(
+            ".log-placeholder"
+        )
+    ) {
+
+        logsContainer.innerHTML = "";
+
+    }
+
 
     const log =
         document.createElement("div");
@@ -343,10 +931,14 @@ function addLog(message) {
 
     log.className = "log";
 
-    log.textContent = message;
+
+    log.textContent =
+        message;
 
 
-    logsContainer.appendChild(log);
+    logsContainer.appendChild(
+        log
+    );
 
 
     logsContainer.scrollTop =
@@ -355,50 +947,140 @@ function addLog(message) {
 }
 
 
-/* ================= RUN WORKFLOW ================= */
+/* =========================================
+   WORKFLOW EXECUTION
+   ========================================= */
+
 
 async function runWorkflow() {
 
     if (nodes.length === 0) {
 
-        addLog("❌ No nodes in workflow.");
+        setStatus(
+            "● Error",
+            "error"
+        );
+
+        addLog(
+            "❌ Cannot run an empty workflow."
+        );
 
         return;
 
     }
 
 
-    status.textContent =
-        "● Running...";
+    const trigger =
+        nodes.find(
+            node =>
+                node.type === "trigger"
+        );
 
-    status.className =
-        "status running";
+
+    if (!trigger) {
+
+        setStatus(
+            "● Error",
+            "error"
+        );
+
+        addLog(
+            "❌ Workflow needs a Trigger node."
+        );
+
+        return;
+
+    }
+
+
+    setStatus(
+        "● Running...",
+        "running"
+    );
 
 
     logsContainer.innerHTML = "";
 
 
-    addLog("Workflow execution started.");
+    addLog(
+        "🚀 Workflow execution started."
+    );
 
 
-    const sortedNodes =
-        [...nodes].sort(
-            (a, b) => a.x - b.x
+    const visited =
+        new Set();
+
+
+    let currentNode =
+        trigger;
+
+
+    while (currentNode) {
+
+
+        if (
+            visited.has(
+                currentNode.id
+            )
+        ) {
+
+            addLog(
+                "❌ Cycle detected. Execution stopped."
+            );
+
+            setStatus(
+                "● Error",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        visited.add(
+            currentNode.id
         );
 
 
-    for (const node of sortedNodes) {
-
         const definition =
-            nodeTypes[node.type];
+            nodeTypes[
+                currentNode.type
+            ];
 
 
         addLog(
-            `${definition.icon} Executing ${definition.title}...`
+            `${definition.icon} Executing ${definition.title} (Node ${currentNode.id})`
         );
 
 
-        await wait(700);
+        await wait(600);
+
+
+        /* Find next node */
+
+        const connection =
+            connections.find(
+                item =>
+                    item.from ===
+                    currentNode.id
+            );
+
+
+        if (!connection) {
+
+            currentNode = null;
+
+        } else {
+
+            currentNode =
+                nodes.find(
+                    node =>
+                        node.id ===
+                        connection.to
+                );
+
+        }
 
     }
 
@@ -408,41 +1090,81 @@ async function runWorkflow() {
     );
 
 
-    status.textContent =
-        "● Completed";
-
-    status.className =
-        "status success";
-
-}
-
-
-/* ================= DELAY ================= */
-
-function wait(ms) {
-
-    return new Promise(
-        resolve => setTimeout(resolve, ms)
+    setStatus(
+        "● Completed",
+        "success"
     );
 
 }
 
 
-/* ================= CLEAR ================= */
+/* =========================================
+   STATUS
+   ========================================= */
+
+
+function setStatus(
+    text,
+    state
+) {
+
+    status.textContent =
+        text;
+
+    status.className =
+        `status ${state}`;
+
+}
+
+
+/* =========================================
+   DELAY
+   ========================================= */
+
+
+function wait(ms) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+
+/* =========================================
+   CLEAR WORKFLOW
+   ========================================= */
+
 
 function clearWorkflow() {
 
     nodes = [];
 
+    connections = [];
+
     nodeId = 0;
+
+    connectingFrom = null;
 
 
     document
-        .querySelectorAll(".workflow-node")
-        .forEach(node => node.remove());
+        .querySelectorAll(
+            ".workflow-node"
+        )
+        .forEach(
+            node => node.remove()
+        );
 
 
-    updateNodeCount();
+    connectionsLayer.innerHTML =
+        "";
+
+
+    updateStats();
 
 
     emptyState.style.display =
@@ -460,37 +1182,45 @@ function clearWorkflow() {
     `;
 
 
-    status.textContent =
-        "● Ready";
-
-    status.className =
-        "status idle";
+    setStatus(
+        "● Ready",
+        "idle"
+    );
 
 }
 
 
-/* ================= LIBRARY EVENTS ================= */
+/* =========================================
+   NODE LIBRARY EVENTS
+   ========================================= */
+
 
 document
-    .querySelectorAll(".library-node")
-    .forEach(button => {
+    .querySelectorAll(
+        ".library-node"
+    )
+    .forEach(
+        button => {
 
-        button.addEventListener(
-            "click",
-            () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const type =
-                    button.dataset.type;
+                    addNode(
+                        button.dataset.type
+                    );
 
-                addNode(type);
+                }
+            );
 
-            }
-        );
-
-    });
+        }
+    );
 
 
-/* ================= BUTTON EVENTS ================= */
+/* =========================================
+   BUTTON EVENTS
+   ========================================= */
+
 
 runBtn.addEventListener(
     "click",
@@ -502,3 +1232,22 @@ clearBtn.addEventListener(
     "click",
     clearWorkflow
 );
+
+
+/* =========================================
+   CANVAS SCROLL
+   ========================================= */
+
+
+canvas.addEventListener(
+    "scroll",
+    drawConnections
+);
+
+
+/* =========================================
+   INITIALIZE
+   ========================================= */
+
+
+updateStats();
