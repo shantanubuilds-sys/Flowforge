@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,7 @@
         <div class="logo">
             <span>⚡</span>
             FlowForge
+            <small>V0.2</small>
         </div>
 
         <div class="actions">
@@ -35,22 +37,24 @@
     </header>
 
 
-    <!-- ================= MAIN ================= -->
+    <!-- ================= APPLICATION ================= -->
 
     <main class="app">
 
-        <!-- SIDEBAR -->
+
+        <!-- ================= SIDEBAR ================= -->
 
         <aside class="sidebar">
 
-            <h2>Nodes</h2>
+            <h2>Node Library</h2>
 
             <p class="description">
-                Add components to build your workflow.
+                Add nodes to your workflow and connect them together.
             </p>
 
 
             <div class="node-library">
+
 
                 <button class="library-node trigger"
                         data-type="trigger">
@@ -59,7 +63,7 @@
 
                     <div>
                         <strong>Trigger</strong>
-                        <small>Start workflow</small>
+                        <small>Starts workflow</small>
                     </div>
 
                 </button>
@@ -72,7 +76,7 @@
 
                     <div>
                         <strong>Action</strong>
-                        <small>Perform an action</small>
+                        <small>Performs an action</small>
                     </div>
 
                 </button>
@@ -85,7 +89,7 @@
 
                     <div>
                         <strong>Condition</strong>
-                        <small>Check a rule</small>
+                        <small>Checks a condition</small>
                     </div>
 
                 </button>
@@ -98,10 +102,21 @@
 
                     <div>
                         <strong>Output</strong>
-                        <small>Finish workflow</small>
+                        <small>Produces result</small>
                     </div>
 
                 </button>
+
+            </div>
+
+
+            <div class="connection-help">
+
+                <strong>🔗 Connect nodes</strong>
+
+                <p>
+                    Click an output port, then click an input port.
+                </p>
 
             </div>
 
@@ -112,61 +127,106 @@
 
         <section class="workspace">
 
+
             <div class="workspace-header">
 
                 <div>
+
                     <h1>Workflow Canvas</h1>
 
                     <p>
-                        Connect your nodes and run the workflow.
+                        Build your workflow by connecting nodes.
                     </p>
+
                 </div>
 
-                <span id="nodeCount">
-                    0 nodes
-                </span>
+
+                <div class="stats">
+
+                    <span id="nodeCount">
+                        0 nodes
+                    </span>
+
+                    <span id="connectionCount">
+                        0 connections
+                    </span>
+
+                </div>
 
             </div>
 
 
+            <!-- ================= CANVAS ================= -->
+
             <div id="canvas" class="canvas">
 
-                <div id="emptyState" class="empty-state">
+
+                <!-- SVG CONNECTION LAYER -->
+
+                <svg
+                    id="connectionsLayer"
+                    class="connections-layer"
+                >
+                </svg>
+
+
+                <!-- NODES WILL BE INSERTED HERE -->
+
+
+                <div
+                    id="emptyState"
+                    class="empty-state"
+                >
 
                     <div class="empty-icon">
                         ⚡
                     </div>
 
-                    <h2>Build your workflow</h2>
+                    <h2>
+                        Build your workflow
+                    </h2>
 
                     <p>
-                        Add a node from the sidebar to get started.
+                        Add nodes from the sidebar to get started.
                     </p>
 
                 </div>
+
 
             </div>
 
         </section>
 
 
-        <!-- ================= LOG PANEL ================= -->
+        <!-- ================= EXECUTION PANEL ================= -->
 
         <aside class="logs">
 
+
             <h2>Execution</h2>
 
-            <div id="status" class="status idle">
+
+            <div
+                id="status"
+                class="status idle"
+            >
                 ● Ready
             </div>
 
-            <div id="logsContainer" class="logs-container">
+
+            <div
+                id="logsContainer"
+                class="logs-container"
+            >
 
                 <div class="log-placeholder">
+
                     Workflow execution logs will appear here.
+
                 </div>
 
             </div>
+
 
         </aside>
 
@@ -176,4 +236,5 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>
