@@ -3,33 +3,96 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>FlowForge</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>FlowForge V1.0</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body>
 
-    <!-- ================= HEADER ================= -->
+    <!-- ================= TOP BAR ================= -->
 
     <header class="topbar">
 
-        <div class="logo">
-            <span>⚡</span>
-            FlowForge
-            <small>V0.2</small>
+        <div class="brand">
+
+            <div class="brand-icon">
+                ⚡
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    FlowForge
+                </div>
+
+                <div class="brand-version">
+                    Workflow Builder · V1.0
+                </div>
+            </div>
+
         </div>
 
-        <div class="actions">
 
-            <button id="clearBtn" class="secondary-btn">
+        <div class="top-actions">
+
+            <button
+                id="saveBtn"
+                class="toolbar-btn"
+            >
+                💾 Save
+            </button>
+
+
+            <button
+                id="loadBtn"
+                class="toolbar-btn"
+            >
+                📂 Load
+            </button>
+
+
+            <button
+                id="exportBtn"
+                class="toolbar-btn"
+            >
+                ↓ Export
+            </button>
+
+
+            <label class="toolbar-btn import-btn">
+
+                ↑ Import
+
+                <input
+                    id="importInput"
+                    type="file"
+                    accept=".json"
+                    hidden
+                >
+
+            </label>
+
+
+            <button
+                id="clearBtn"
+                class="toolbar-btn danger-btn"
+            >
                 Clear
             </button>
 
-            <button id="runBtn" class="run-btn">
-                ▶ Run Workflow
+
+            <button
+                id="runBtn"
+                class="run-btn"
+            >
+                ▶ Run
             </button>
 
         </div>
@@ -37,140 +100,297 @@
     </header>
 
 
-    <!-- ================= APPLICATION ================= -->
+
+    <!-- ================= MAIN APP ================= -->
 
     <main class="app">
 
 
-        <!-- ================= SIDEBAR ================= -->
+        <!-- ================= LEFT SIDEBAR ================= -->
 
         <aside class="sidebar">
 
-            <h2>Node Library</h2>
 
-            <p class="description">
-                Add nodes to your workflow and connect them together.
-            </p>
+            <div class="panel-title">
 
+                <div>
+                    <h2>Node Library</h2>
+
+                    <p>
+                        Build your workflow
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- NODE LIBRARY -->
 
             <div class="node-library">
 
 
-                <button class="library-node trigger"
-                        data-type="trigger">
+                <button
+                    class="library-node trigger-node"
+                    data-type="trigger"
+                >
 
-                    <span>⚡</span>
+                    <span class="library-icon">
+                        ⚡
+                    </span>
 
-                    <div>
-                        <strong>Trigger</strong>
-                        <small>Starts workflow</small>
-                    </div>
+                    <span>
 
-                </button>
+                        <strong>
+                            Trigger
+                        </strong>
 
+                        <small>
+                            Start the workflow
+                        </small>
 
-                <button class="library-node action"
-                        data-type="action">
-
-                    <span>⚙️</span>
-
-                    <div>
-                        <strong>Action</strong>
-                        <small>Performs an action</small>
-                    </div>
+                    </span>
 
                 </button>
 
 
-                <button class="library-node condition"
-                        data-type="condition">
 
-                    <span>🔀</span>
+                <button
+                    class="library-node action-node"
+                    data-type="action"
+                >
 
-                    <div>
-                        <strong>Condition</strong>
-                        <small>Checks a condition</small>
-                    </div>
+                    <span class="library-icon">
+                        ⚙️
+                    </span>
+
+                    <span>
+
+                        <strong>
+                            Action
+                        </strong>
+
+                        <small>
+                            Perform an action
+                        </small>
+
+                    </span>
 
                 </button>
 
 
-                <button class="library-node output"
-                        data-type="output">
 
-                    <span>📤</span>
+                <button
+                    class="library-node condition-node"
+                    data-type="condition"
+                >
 
-                    <div>
-                        <strong>Output</strong>
-                        <small>Produces result</small>
-                    </div>
+                    <span class="library-icon">
+                        🔀
+                    </span>
+
+                    <span>
+
+                        <strong>
+                            Condition
+                        </strong>
+
+                        <small>
+                            Evaluate a rule
+                        </small>
+
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="library-node output-node"
+                    data-type="output"
+                >
+
+                    <span class="library-icon">
+                        📤
+                    </span>
+
+                    <span>
+
+                        <strong>
+                            Output
+                        </strong>
+
+                        <small>
+                            Finish workflow
+                        </small>
+
+                    </span>
 
                 </button>
 
             </div>
 
 
-            <div class="connection-help">
 
-                <strong>🔗 Connect nodes</strong>
+            <!-- INSTRUCTIONS -->
+
+            <div class="sidebar-card">
+
+                <h3>
+                    🔗 Connections
+                </h3>
 
                 <p>
-                    Click an output port, then click an input port.
+                    Click an output port,
+                    then click an input port.
                 </p>
+
+            </div>
+
+
+            <div class="sidebar-card">
+
+                <h3>
+                    🔀 Conditions
+                </h3>
+
+                <p>
+                    Configure a variable,
+                    operator and value in
+                    the inspector.
+                </p>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="sidebar-stats">
+
+                <div class="mini-stat">
+
+                    <span id="sidebarNodeCount">
+                        0
+                    </span>
+
+                    <small>
+                        Nodes
+                    </small>
+
+                </div>
+
+
+                <div class="mini-stat">
+
+                    <span id="sidebarConnectionCount">
+                        0
+                    </span>
+
+                    <small>
+                        Connections
+                    </small>
+
+                </div>
 
             </div>
 
         </aside>
 
 
-        <!-- ================= WORKSPACE ================= -->
+
+        <!-- ================= CENTER ================= -->
 
         <section class="workspace">
 
+
+            <!-- WORKSPACE HEADER -->
 
             <div class="workspace-header">
 
                 <div>
 
-                    <h1>Workflow Canvas</h1>
+                    <h1>
+                        Workflow Canvas
+                    </h1>
 
                     <p>
-                        Build your workflow by connecting nodes.
+                        Design and execute your automation.
                     </p>
 
                 </div>
 
 
-                <div class="stats">
+                <div class="canvas-tools">
 
-                    <span id="nodeCount">
-                        0 nodes
+                    <button
+                        id="zoomOutBtn"
+                        title="Zoom out"
+                    >
+                        −
+                    </button>
+
+
+                    <span id="zoomValue">
+                        100%
                     </span>
 
-                    <span id="connectionCount">
-                        0 connections
-                    </span>
+
+                    <button
+                        id="zoomInBtn"
+                        title="Zoom in"
+                    >
+                        +
+                    </button>
+
+
+                    <button
+                        id="resetViewBtn"
+                        title="Reset view"
+                    >
+                        ⛶
+                    </button>
 
                 </div>
 
             </div>
 
 
-            <!-- ================= CANVAS ================= -->
 
-            <div id="canvas" class="canvas">
+            <!-- CANVAS -->
 
+            <div
+                id="canvas"
+                class="canvas"
+            >
 
-                <!-- SVG CONNECTION LAYER -->
 
                 <svg
                     id="connectionsLayer"
                     class="connections-layer"
                 >
+
+                    <defs>
+
+                        <marker
+                            id="arrow"
+                            viewBox="0 0 10 10"
+                            refX="9"
+                            refY="5"
+                            markerWidth="6"
+                            markerHeight="6"
+                            orient="auto-start-reverse"
+                        >
+
+                            <path
+                                d="M 0 0 L 10 5 L 0 10 z"
+                                class="arrow"
+                            />
+
+                        </marker>
+
+                    </defs>
+
                 </svg>
 
-
-                <!-- NODES WILL BE INSERTED HERE -->
 
 
                 <div
@@ -183,52 +403,117 @@
                     </div>
 
                     <h2>
-                        Build your workflow
+                        Start building
                     </h2>
 
                     <p>
-                        Add nodes from the sidebar to get started.
+                        Add a Trigger, Action,
+                        Condition or Output.
                     </p>
 
                 </div>
-
 
             </div>
 
         </section>
 
 
-        <!-- ================= EXECUTION PANEL ================= -->
 
-        <aside class="logs">
+        <!-- ================= RIGHT PANEL ================= -->
 
-
-            <h2>Execution</h2>
+        <aside class="right-panel">
 
 
-            <div
-                id="status"
-                class="status idle"
-            >
-                ● Ready
-            </div>
+            <!-- INSPECTOR -->
 
+            <section class="inspector">
 
-            <div
-                id="logsContainer"
-                class="logs-container"
-            >
+                <div class="panel-heading">
 
-                <div class="log-placeholder">
+                    <div>
 
-                    Workflow execution logs will appear here.
+                        <h2>
+                            Inspector
+                        </h2>
+
+                        <p>
+                            Configure selected node
+                        </p>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <div
+                    id="inspectorContent"
+                    class="inspector-content"
+                >
+
+                    <div class="inspector-empty">
+
+                        <div>
+                            🎯
+                        </div>
+
+                        <p>
+                            Select a node to
+                            configure it.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- EXECUTION -->
+
+            <section class="execution-panel">
+
+                <div class="panel-heading">
+
+                    <div>
+
+                        <h2>
+                            Execution
+                        </h2>
+
+                        <p>
+                            Workflow activity
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="status"
+                        class="status idle"
+                    >
+                        ● Ready
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="logsContainer"
+                    class="logs"
+                >
+
+                    <div class="log-placeholder">
+                        Execution logs will
+                        appear here.
+                    </div>
+
+                </div>
+
+            </section>
 
         </aside>
+
 
     </main>
 
